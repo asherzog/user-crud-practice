@@ -21,6 +21,20 @@ router.get('/:id', function(req, res, next) {
   }
 });
 
+
+router.get('/:id/sticker', (req,res)=>{
+  if (!isNaN(req.params.id)) {
+    user.getByUser(req.params.id).then(stickers => {
+      res.json(stickers);
+    });
+  } else {
+    resError(res, 500, "Invalid ID");
+  }
+});
+
+
+
+
 function resError(res, statusCode, message) {
   res.status(statusCode);
   res.json({message});
