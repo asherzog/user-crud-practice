@@ -71,6 +71,7 @@ router.post('/login', (req, res, next) => {
                   secure: req.app.get('env') != 'development'
                 });
                 res.json({
+                  id: user.id,
                   message: 'Logged in!'
                 });
               } else {
