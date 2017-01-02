@@ -2,8 +2,11 @@ var express = require('express');
 var router = express.Router();
 var user = require('../db/query');
 
+
+const authMiddleware = require('../auth/middleware.js');
+
 /* GET users listing. */
-router.get('/:id', function(req, res, next) {
+router.get('/:id', authMiddleware.allowAccess, function(req, res, next) {
   if (!isNaN(req.params.id)){
     user.getOne(req.params.id)
         .then(user => {
@@ -22,7 +25,7 @@ router.get('/:id', function(req, res, next) {
 });
 
 
-router.get('/:id/sticker', (req,res)=>{
+router.get('/:id/sticker', authMiddleware.allowAccess, (req,res)=>{
   if (!isNaN(req.params.id)) {
     user.getByUser(req.params.id).then(stickers => {
       res.json(stickers);
@@ -31,8 +34,6 @@ router.get('/:id/sticker', (req,res)=>{
     resError(res, 500, "Invalid ID");
   }
 });
-
-
 
 
 function resError(res, statusCode, message) {

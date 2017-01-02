@@ -40,6 +40,7 @@ router.post('/signup', (req, res, next) => {
               User
                 .create(user)
                 .then(id => {
+                  setUserIdCookie(req, res, id)
                   res.json({
                     id,
                     message: '👍'
@@ -55,6 +56,13 @@ router.post('/signup', (req, res, next) => {
   }
 });
 
+function setUserIdCookie(req, res, id) {
+  res.cookie('user_id', id, {
+    httpOnly: true,
+    signed: true,
+    secure: req.app.get('env') != 'development'
+  });
+}
 
 router.post('/login', (req, res, next) => {
   if(validUser(req.body)) {
@@ -65,11 +73,7 @@ router.post('/login', (req, res, next) => {
           bcrypt.compare(req.body.password, user.password)
             .then(result => {
               if (result) {
-                res.cookie('user_id', user.id, {
-                  httpOnly: true,
-                  signed: true,
-                  secure: req.app.get('env') != 'development'
-                });
+                setUserIdCookie(req, res, user.id);
                 res.json({
                   id: user.id,
                   message: 'Logged in!'
@@ -85,6 +89,13 @@ router.post('/login', (req, res, next) => {
   } else {
     next(new Error('Invalid login'));
   }
+});
+
+router.get('/logout', (req, res) => {
+  res.clearCookie('user_id');
+  res.json({
+    message: '🔒'
+  });
 });
 
 module.exports = router;
